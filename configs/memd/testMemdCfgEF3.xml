@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+                http://www.springframework.org/schema/beans
+                http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean  id="memd" class="hht.memd.MultivariateEMD" >
+		<constructor-arg ref="sifter"/>
+		<constructor-arg ref="extremesLocator"/>
+                <constructor-arg ref="vectorGenerator"/>
+	</bean>
+
+	<bean id="extremesLocator" class="hht.emd.sifting.extremes.locators.LocateLocalExtremaFacade" >
+		<constructor-arg ref="maxLocator" />
+		<constructor-arg ref="minLocator" />
+	</bean>	
+
+	<bean id="minLocator" class="hht.emd.sifting.extremes.locators.MinimumFinder">
+	</bean>
+
+	<bean id="maxLocator" class="hht.emd.sifting.extremes.locators.MaximumFinder">
+	</bean>	
+	
+	<bean id="sifter" class="hht.memd.sifting.MultivariateSifter">
+		<constructor-arg ref="stoppingCriteria"/>
+		<constructor-arg ref="zeroEstimator"/>
+		<constructor-arg ref="extremesLocator"/>
+                <constructor-arg ref="vectorGenerator"/>
+	</bean>
+	
+	<bean id="zeroEstimator" class="hht.memd.sifting.extremes.estimators.CustomMirror"/>
+	
+	<bean id="stoppingCriteria" class="hht.memd.sifting.stoppingCriteria.MultivariateEvaluatingFunction">
+		<property name="treshold" value="0.1"/>
+                <property name="tolerance" value="0.01"/>
+	</bean>
+        
+        <bean id="vectorGenerator" class="hht.memd.sifting.vectorGenerators.HammersleyVectorGenerator">
+                <property name="count" value="64"/>
+        </bean>
+</beans>

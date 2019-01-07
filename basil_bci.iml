@@ -4,6 +4,9 @@
     <facet type="Spring" name="Spring">
       <configuration />
     </facet>
+    <facet type="Python" name="Python">
+      <configuration sdkName="Jython" />
+    </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7">
     <output url="file://$MODULE_DIR$/target/classes" />
@@ -297,5 +300,9 @@
     <orderEntry type="library" name="Maven: biz.source_code.dsp:dsp-collection:1.0" level="project" />
     <orderEntry type="library" name="Maven: net.java.dev.jna:jna:4.2.2" level="project" />
     <orderEntry type="library" name="DP_HHT" level="project" />
+    <orderEntry type="library" name="libs (2)" level="project" />
+    <orderEntry type="library" name="libs" level="project" />
+    <orderEntry type="library" name="Jython interpreter library" level="application" />
+    <orderEntry type="library" name="jython2.7" level="project" />
   </component>
 </module>

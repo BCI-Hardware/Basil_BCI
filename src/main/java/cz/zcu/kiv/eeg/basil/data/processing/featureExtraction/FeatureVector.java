@@ -128,7 +128,7 @@ public class FeatureVector {
             return featureVector.reshape(1, shape[0]).toDoubleMatrix();
         } else { //3d, ...
             int len = 1;
-            for (int i = 0; i < shape.length - 1; i++)
+            for (int i = 1; i < shape.length; i++)
                 len *= shape[i];
 
             return featureVector.dup().reshape(shape[0], len).toDoubleMatrix();

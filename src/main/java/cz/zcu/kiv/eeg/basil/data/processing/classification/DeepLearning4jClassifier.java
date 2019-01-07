@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -119,7 +120,6 @@ public abstract class DeepLearning4jClassifier implements IClassifier {
     }
 
     protected DataSet createDataSet3(List<FeatureVector> featureVectors) {
-
         try {
             double[][] m = featureVectors.get(0).getFeatureMatrix();
             int[] shape = {1, 1, m.length, m[0].length };
@@ -130,6 +130,37 @@ public abstract class DeepLearning4jClassifier implements IClassifier {
                 double[] l = {fv.getExpectedOutput(),Math.abs(1 - fv.getExpectedOutput())};
                 INDArray label = Nd4j.create(l);
                 d = new DataSet(fv.getShapedFeatureVector(shape), label);
+                lst.add(d);
+            }
+
+            return DataSet.merge(lst);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    protected DataSet createDataSet4(List<FeatureVector> featureVectors) {
+
+        try {
+            FeatureVector first = featureVectors.get(0);
+            int[] orig = first.shape();
+            int[] shape = new int[4];
+
+            Arrays.fill(shape,1);
+            int offset = shape.length - orig.length;
+            for (int i = orig.length -1; i >= 0; i--)
+                shape[offset + i] = orig[i];
+
+            int[] t = {1,1,3,1536};
+
+            List<DataSet> lst = new ArrayList<>(featureVectors.size());
+            DataSet d;
+            for (FeatureVector fv : featureVectors) {
+                double[] l = {fv.getExpectedOutput(),Math.abs(1 - fv.getExpectedOutput())};
+                INDArray label = Nd4j.create(l);
+                d = new DataSet(fv.getShapedFeatureVector(t), label);
                 lst.add(d);
             }
 

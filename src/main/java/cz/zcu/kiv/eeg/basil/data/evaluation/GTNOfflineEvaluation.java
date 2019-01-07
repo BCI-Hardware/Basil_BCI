@@ -9,6 +9,7 @@ import cz.zcu.kiv.eeg.basil.data.processing.IWorkflowController;
 import cz.zcu.kiv.eeg.basil.data.processing.TestingWorkflowController;
 import cz.zcu.kiv.eeg.basil.data.processing.TrainWorkflowController;
 import cz.zcu.kiv.eeg.basil.data.processing.classification.*;
+import cz.zcu.kiv.eeg.basil.data.processing.featureExtraction.MemdFeatureExtraction;
 import cz.zcu.kiv.eeg.basil.data.processing.featureExtraction.RawDataFeatureExtraction;
 import cz.zcu.kiv.eeg.basil.data.processing.featureExtraction.IFeatureExtraction;
 import cz.zcu.kiv.eeg.basil.data.processing.featureExtraction.WaveletTransformFeatureExtraction;
@@ -51,8 +52,6 @@ public class GTNOfflineEvaluation {
 	 */
 	public static void main(String[] args) {
 		long startTime = System.nanoTime();
-		IFeatureExtraction fe  = new WaveletTransformFeatureExtraction();
-
 		// Workflow
 		ISegmentation epochExtraction = new EpochExtraction(100, 1000);
 		List<IPreprocessing> preprocessing = new ArrayList<>();
@@ -61,7 +60,7 @@ public class GTNOfflineEvaluation {
 		preprocessing.add(new IntervalSelection(175, 512));
 		presegmentation.add(new ChannelSelection(new String[] {"Fz", "Cz", "Pz"}));
 
-		RawDataFeatureExtraction efe = new RawDataFeatureExtraction();
+		IFeatureExtraction efe =  new MemdFeatureExtraction(3);
 		ArrayList<IFeatureExtraction> feLst = new ArrayList<>();
 		feLst.add(efe);
 		//feLst.add(fe);
@@ -82,6 +81,7 @@ public class GTNOfflineEvaluation {
 			for (int j = 0; j < directories.size(); j++) {
 				directories.set(j, DATA_PATH + "numbers/" + directories.get(j));
 			}
+
 			// data/numbers/
 			AbstractDataPreprocessor dataPreprocessor = new EpochDataPreprocessor(preprocessing, presegmentation, null,  epochExtraction);
 

@@ -175,7 +175,7 @@ public class OffLineDataProvider extends AbstractDataProvider {
     }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
         this.running = false;
     }
 }
