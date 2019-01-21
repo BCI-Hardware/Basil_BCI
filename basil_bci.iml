@@ -14,12 +14,17 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/main" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="DP_HHT" level="project" />
+    <orderEntry type="library" name="libs (2)" level="project" />
+    <orderEntry type="library" name="libs" level="project" />
+    <orderEntry type="library" name="Jython interpreter library" level="application" />
+    <orderEntry type="library" name="jython2.7" level="project" />
     <orderEntry type="library" name="Maven: org.deeplearning4j:deeplearning4j-ui_2.10:1.0.0-alpha" level="project" />
     <orderEntry type="library" name="Maven: org.deeplearning4j:deeplearning4j-play_2.10:1.0.0-alpha" level="project" />
     <orderEntry type="library" name="Maven: com.typesafe.play:play-java_2.10:2.4.8" level="project" />
@@ -76,9 +81,6 @@
     <orderEntry type="library" name="Maven: org.fusesource.leveldbjni:leveldbjni-win32:1.5" level="project" />
     <orderEntry type="library" name="Maven: org.fusesource.leveldbjni:leveldbjni-win64:1.5" level="project" />
     <orderEntry type="library" name="Maven: org.reflections:reflections:0.9.10" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.4.4" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.4.4" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.4.4" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-scala_2.10:2.4.4" level="project" />
     <orderEntry type="library" name="Maven: org.scala-lang:scala-reflect:2.10.4" level="project" />
     <orderEntry type="library" name="Maven: com.thoughtworks.paranamer:paranamer:2.6" level="project" />
@@ -174,7 +176,6 @@
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.4" level="project" />
     <orderEntry type="library" name="Maven: org.nd4j:jackson:1.0.0-alpha" level="project" />
     <orderEntry type="library" name="Maven: org.yaml:snakeyaml:1.12" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.woodstox:stax2-api:3.1.4" level="project" />
     <orderEntry type="library" name="Maven: joda-time:joda-time:2.2" level="project" />
     <orderEntry type="library" name="Maven: org.datavec:datavec-api:1.0.0-alpha" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains:annotations:13.0" level="project" />
@@ -292,6 +293,14 @@
     <orderEntry type="library" name="Maven: org.apache.avalon.framework:avalon-framework-api:4.3.1" level="project" />
     <orderEntry type="library" name="Maven: cz.zcu.kiv:eegdsp:1.0" level="project" />
     <orderEntry type="library" name="Maven: cz.zcu.kiv:EEGLoader:2.2" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.8" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.9.8" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.9.0" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.9.8" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.9.8" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.woodstox:stax2-api:3.1.4" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.woodstox:woodstox-core:5.0.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: javax.xml.bind:jaxb-api:2.3.0" level="project" />
     <orderEntry type="library" name="Maven: net.sf.javaml:javaml:0.1.5" level="project" />
     <orderEntry type="library" name="Maven: org.neuroph:core:2.9" level="project" />
     <orderEntry type="library" name="Maven: MPERPs:cz.zcu.kiv:1.0" level="project" />
@@ -299,10 +308,5 @@
     <orderEntry type="library" name="Maven: nz.ac.waikato:weka:1.0" level="project" />
     <orderEntry type="library" name="Maven: biz.source_code.dsp:dsp-collection:1.0" level="project" />
     <orderEntry type="library" name="Maven: net.java.dev.jna:jna:4.2.2" level="project" />
-    <orderEntry type="library" name="DP_HHT" level="project" />
-    <orderEntry type="library" name="libs (2)" level="project" />
-    <orderEntry type="library" name="libs" level="project" />
-    <orderEntry type="library" name="Jython interpreter library" level="application" />
-    <orderEntry type="library" name="jython2.7" level="project" />
   </component>
 </module>
