@@ -22,7 +22,7 @@ public class StreamHeader {
     private double sampling;
 
     @JacksonXmlProperty(localName = "channel_format")
-    private String channelFormat;
+    private ChannelFormat channelFormat;
 
     @JacksonXmlProperty(localName = "source_id")
     private String sourceId;
@@ -73,11 +73,11 @@ public class StreamHeader {
         this.sampling = sampling;
     }
 
-    public String getChannelFormat() {
+    public ChannelFormat getChannelFormat() {
         return channelFormat;
     }
 
-    public void setChannelFormat(String channelFormat) {
+    public void setChannelFormat(ChannelFormat channelFormat) {
         this.channelFormat = channelFormat;
     }
 
