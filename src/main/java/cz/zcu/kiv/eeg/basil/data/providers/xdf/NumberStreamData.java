@@ -5,18 +5,40 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Data class used to store number streams (e.g. double, int,...) loaded from xdf file
  * Created by Tomas Prokop on 28.01.2019.
  */
-public class StreamData<T extends Number> {
+public class NumberStreamData<T extends Number> implements IStreamData<T> {
     private List<T>[] samples;
     private List<Double> timeStamps;
+    private List<Double> clockTimes;
+    private List<Double> clockValues;
 
-    public StreamData(int channels) {
+    private int channelCount;
+
+    public NumberStreamData(int channels) {
+        channelCount = channels;
         samples = new List[channels];
         for (int i = 0; i < channels; i++) {
+
             samples[i] = new ArrayList<>();
         }
+        clockTimes = new ArrayList<>();
+        clockValues = new ArrayList<>();
         timeStamps = new ArrayList<>();
+    }
+
+    @Override
+    public int getChannelCount() {
+        return channelCount;
+    }
+
+    public List<Double> getClockTimes() {
+        return clockTimes;
+    }
+
+    public List<Double> getClockValues() {
+        return clockValues;
     }
 
     public List<T>[] getSamples() {
@@ -42,5 +64,13 @@ public class StreamData<T extends Number> {
 
     public void addTimeStamps(Double[] vals) {
         Collections.addAll(timeStamps, vals);
+    }
+
+    public void addClockTime(double stamp) {
+        clockTimes.add(stamp);
+    }
+
+    public void addClockValue(double value) {
+        clockValues.add(value);
     }
 }

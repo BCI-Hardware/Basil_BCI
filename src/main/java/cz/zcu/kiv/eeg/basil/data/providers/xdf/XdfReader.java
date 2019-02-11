@@ -13,8 +13,7 @@ import java.util.HashMap;
  * Created by Tomas Prokop on 14.01.2019.
  */
 public class XdfReader {
-    private HashMap<Integer, StreamHeader> streamheaders;
-    private HashMap<Integer, StreamData> streamdata;
+    private XdfFileData xdfData;
 
     public boolean read(String file) {
         File f = new File(file);
@@ -22,8 +21,7 @@ public class XdfReader {
             return false;
 
         try {
-            streamheaders = new HashMap<>();
-            streamdata = new HashMap<>();
+            xdfData = new XdfFileData();
 
             byte[] buffer = new byte[4];
             FileInputStream fis = new FileInputStream(f);
@@ -38,7 +36,11 @@ public class XdfReader {
             boolean readChunk = true;
             while (readChunk) {
                 long len = readVarLenInteger(bis);
+                if (len == -1) //eof
+                    break;
+
                 short tag = readTag(bis);
+                System.out.println(tag);
                 String xml = null;
 
                 XmlMapper mapper;
@@ -59,29 +61,50 @@ public class XdfReader {
                         xml = new String(buffer, StandardCharsets.UTF_8);
                         mapper = new XmlMapper();
                         StreamHeader sHeader = mapper.readValue(xml, StreamHeader.class);
-                        streamheaders.put(id, sHeader);
-                        streamdata.put(id, createStreamData(sHeader));
+                        xdfData.addStreamHeader(id, sHeader);
+                        xdfData.addStreamData(id, createStreamData(sHeader));
                         break;
-                    case 3:
+                    case 3: //data chunk
                         id = readStreamId(bis);
-                        len = readVarLenInteger(bis);
-                        sHeader = streamheaders.get(id);
-
-                        if (sHeader.getChannelFormat() != ChannelFormat.string) {
-                            readData(bis, len, id);
-                        } else {
+                        sHeader = xdfData.getHeader(id);
+                        if (sHeader.getChannelFormat() == ChannelFormat.string) {
                             //not implemented yet
+                            buffer = new byte[(int) len - 6];
+                            bis.read(buffer);
                             continue;
                         }
+
+                        long varLen = readVarLenInteger(bis);
+                        readData(bis, varLen, id);
                         break;
-                    default:
-                        readChunk = false;
+                    case 4: //clock offset chunk
+                        id = readStreamId(bis);
+                        buffer = new byte[8];
+                        bis.read(buffer);
+                        ByteBuffer wrapped = ByteBuffer.wrap(buffer);
+                        wrapped.order(ByteOrder.LITTLE_ENDIAN);
+                        xdfData.getData(id).addClockTime(wrapped.getDouble());
+                        bis.read(buffer);
+                        wrapped = ByteBuffer.wrap(buffer);
+                        xdfData.getData(id).addClockValue(wrapped.getDouble());
+                        break;
+                    case 6: //footer
+                        id = readStreamId(bis);
+                        buffer = new byte[(int) len - 6]; //todo what if len > int.MaxValue???
+                        bis.read(buffer);
+                        mapper = new XmlMapper();
+                        xml = new String(buffer, StandardCharsets.UTF_8);
+                        HashMap<String, Object> footer = mapper.readValue(xml, HashMap.class);
+                        xdfData.addStreamFooter(id, footer);
+                        break;
+                    default: //just read chunk like boundary and don't care about it
+                        buffer = new byte[(int) len - 2];
+                        bis.read(buffer);
                         break;
                 }
             }
 
             return true;
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -92,30 +115,40 @@ public class XdfReader {
     }
 
     private void readData(InputStream bis, long len, int id) throws IOException {
-        StreamHeader header = streamheaders.get(id);
-        StreamData data = streamdata.get(id);
+        StreamHeader header = xdfData.getHeader(id);
+        IStreamData data = xdfData.getData(id);
 
-        ByteBuffer wrap = ByteBuffer.allocate(128);
+        ByteBuffer wrap = ByteBuffer.allocate(1024);
         wrap.order(ByteOrder.LITTLE_ENDIAN);
         byte[] buffer;
         Double[] stamps = new Double[(int) len];
-        Arrays.fill(stamps, 0);
+        Arrays.fill(stamps, 0.0);
         int bytesToRead = header.getChannelCount() * ChannelFormat.getBytesCount(header.getChannelFormat());
+
+        double lastStamp = 0;
+        int size = data.getTimeStamps().size();
+        if (size > 0) {
+            lastStamp = (double) data.getTimeStamps().get(size - 1);
+        }
 
         for (int i = 0; i < len; i++) {
             int b = bis.read();
 
-            if (b > 0) {
+            if (b > 0) { //timestamp available
                 buffer = new byte[8];
                 bis.read(buffer);
                 wrap.put(buffer);
+                wrap.rewind();
                 stamps[i] = wrap.getDouble();
                 wrap.clear();
+            } else { //timestamp needs to be computed
+                stamps[i] = lastStamp + header.getTimeDiff();
             }
 
             buffer = new byte[bytesToRead];
             bis.read(buffer);
             wrap.put(buffer);
+            wrap.rewind();
             for (int k = 0; k < header.getChannelCount(); k++) {
                 switch (header.getChannelFormat()) {
                     case int8:
@@ -146,26 +179,24 @@ public class XdfReader {
         data.addTimeStamps(stamps);
     }
 
-    private StreamData createStreamData(StreamHeader header) {
+    private IStreamData createStreamData(StreamHeader header) {
         int channels = header.getChannelCount();
         switch (header.getChannelFormat()) {
             case int8:
-                return new StreamData<Byte>(channels);
+                return new NumberStreamData<Byte>(channels);
             case int16:
-                return new StreamData<Short>(channels);
+                return new NumberStreamData<Short>(channels);
             case int32:
-                return new StreamData<Integer>(channels);
+                return new NumberStreamData<Integer>(channels);
             case int64:
-                return new StreamData<Long>(channels);
+                return new NumberStreamData<Long>(channels);
             case float32:
-                return new StreamData<Float>(channels);
+                return new NumberStreamData<Float>(channels);
             case double64:
-                return new StreamData<Double>(channels);
+                return new NumberStreamData<Double>(channels);
             default:
-                break;
+                return new StringStreamData(channels);
         }
-
-        return null;
     }
 
     private int readStreamId(InputStream is) throws IOException {
@@ -188,6 +219,9 @@ public class XdfReader {
 
     private long readVarLenInteger(InputStream is) throws IOException {
         int n = is.read();
+        if (n == -1)
+            return n;
+
         if (n == 1) {
             return is.read();
         }

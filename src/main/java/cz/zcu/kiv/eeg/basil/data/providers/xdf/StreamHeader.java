@@ -11,6 +11,7 @@ import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamHeader {
+
     private String name;
 
     private String type;
@@ -40,6 +41,8 @@ public class StreamHeader {
     private String hostname;
 
     private Map<String, Object> desc;
+
+    private double tDiff;
 
     public String getName() {
         return name;
@@ -71,6 +74,7 @@ public class StreamHeader {
 
     public void setSampling(double sampling) {
         this.sampling = sampling;
+        this.tDiff = sampling > 0 ? 1.0 / sampling : 0;
     }
 
     public ChannelFormat getChannelFormat() {
@@ -135,5 +139,9 @@ public class StreamHeader {
 
     public void setDesc(Map<String, Object> desc) {
         this.desc = desc;
+    }
+
+    public double getTimeDiff() {
+        return tDiff;
     }
 }
