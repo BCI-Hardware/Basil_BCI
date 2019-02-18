@@ -1,5 +1,6 @@
 package test.java.cz.zcu.kiv.eeg.basil;
 
+import cz.zcu.kiv.eeg.basil.data.providers.xdf.XdfFileData;
 import cz.zcu.kiv.eeg.basil.data.providers.xdf.XdfReader;
 import org.junit.Test;
 
@@ -13,7 +14,8 @@ public class XdfTest {
     @Test
     public void textXdfRead() {
         XdfReader xRead = new XdfReader();
-        boolean res = xRead.read("E:\\xdf_sample.xdf");
+        //boolean res = xRead.read("E:\\xdf_sample.xdf");
+        boolean res = xRead.read("E:\\2.xdf");
         assertTrue(res);
     }
 }

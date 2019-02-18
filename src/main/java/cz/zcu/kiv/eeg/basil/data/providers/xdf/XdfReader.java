@@ -15,6 +15,10 @@ import java.util.HashMap;
 public class XdfReader {
     private XdfFileData xdfData;
 
+    public XdfFileData getXdfData() {
+        return xdfData;
+    }
+
     public boolean read(String file) {
         File f = new File(file);
         if (!f.exists())
@@ -53,6 +57,7 @@ public class XdfReader {
                         xml = new String(buffer, StandardCharsets.UTF_8);
                         mapper = new XmlMapper();
                         FileHeader header = mapper.readValue(xml, FileHeader.class);
+                        xdfData.setHeader(header);
                         break;
                     case 2: //stream header
                         int id = readStreamId(bis);
@@ -67,15 +72,13 @@ public class XdfReader {
                     case 3: //data chunk
                         id = readStreamId(bis);
                         sHeader = xdfData.getHeader(id);
-                        if (sHeader.getChannelFormat() == ChannelFormat.string) {
-                            //not implemented yet
-                            buffer = new byte[(int) len - 6];
-                            bis.read(buffer);
-                            continue;
+                        long varLen = readVarLenInteger(bis);
+                        if (sHeader.getChannelFormat() != ChannelFormat.string) {
+                            readData(bis, varLen, id);
+                        } else {
+                            readStringData(bis, varLen, id);
                         }
 
-                        long varLen = readVarLenInteger(bis);
-                        readData(bis, varLen, id);
                         break;
                     case 4: //clock offset chunk
                         id = readStreamId(bis);
@@ -90,7 +93,7 @@ public class XdfReader {
                         break;
                     case 6: //footer
                         id = readStreamId(bis);
-                        buffer = new byte[(int) len - 6]; //todo what if len > int.MaxValue???
+                        buffer = new byte[(int) len - 6];
                         bis.read(buffer);
                         mapper = new XmlMapper();
                         xml = new String(buffer, StandardCharsets.UTF_8);
@@ -112,6 +115,50 @@ public class XdfReader {
         }
 
         return false;
+    }
+
+    private void readStringData(InputStream bis, long len, int id) throws IOException {
+        StreamHeader header = xdfData.getHeader(id);
+        IStreamData data = xdfData.getData(id);
+
+        byte[] buffer;
+        Double[] stamps = new Double[(int) len];
+        Arrays.fill(stamps, 0.0);
+
+        double lastStamp = 0;
+        int size = data.getTimeStamps().size();
+        if (size > 0) {
+            lastStamp = (double) data.getTimeStamps().get(size - 1);
+        }
+
+        ByteBuffer wrap = ByteBuffer.allocate(8);
+        wrap.order(ByteOrder.LITTLE_ENDIAN);
+        int bytesToRead = -1;
+
+        for (int i = 0; i < len; i++) {
+            int b = bis.read();
+
+            if (b > 0) { //timestamp available
+                buffer = new byte[8];
+                bis.read(buffer);
+                wrap.put(buffer);
+                wrap.rewind();
+                stamps[i] = wrap.getDouble();
+                wrap.clear();
+            } else { //timestamp needs to be computed
+                stamps[i] = lastStamp + header.getTimeDiff();
+            }
+
+            for (int k = 0; k < header.getChannelCount(); k++) {
+                bytesToRead = (int) readVarLenInteger(bis);
+                buffer = new byte[bytesToRead];
+                bis.read(buffer);
+                String value = new String(buffer);
+                data.addSample(value, k);
+            }
+        }
+
+        data.addTimeStamps(stamps);
     }
 
     private void readData(InputStream bis, long len, int id) throws IOException {
