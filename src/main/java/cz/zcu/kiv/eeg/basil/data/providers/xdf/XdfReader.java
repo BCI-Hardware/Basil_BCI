@@ -44,7 +44,6 @@ public class XdfReader {
                     break;
 
                 short tag = readTag(bis);
-                System.out.println(tag);
                 String xml = null;
 
                 XmlMapper mapper;
